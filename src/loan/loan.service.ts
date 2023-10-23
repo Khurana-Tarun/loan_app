@@ -147,7 +147,7 @@ export class LoanService {
             res.message = 'Loan has been paid';
             loan.remaining_amount = 0;
             loan.remaining_emis = 0;
-            loan.transactional_logs.push(new Date().valueOf() + ": Loan request has been paid by user" );
+            loan.transactional_logs.push(new Date().valueOf() + ":amount(" + amount + ") Loan has been paid by user" );
             await this.loanRepository.update({ id: loanId }, loan);
             await this.emiRepository.update({ loan_id: loanId, status: 'PENDING' }, { status: 'PAID' })
             break;
@@ -157,7 +157,7 @@ export class LoanService {
             res.message = 'EMI has been paid';
             loan.remaining_amount = loan.remaining_amount - amount;
             loan.remaining_emis = loan.remaining_emis - 1;
-            loan.transactional_logs.push(new Date().valueOf() + ":" + amount +" EMI has been paid by user" );
+            loan.transactional_logs.push(new Date().valueOf() + ":amount(" + amount + ") EMI has been paid by user" );
             await this.loanRepository.update({ id: loanId }, loan);
             const emi = await this.emiRepository.find({
               where: { loan_id: loanId, status: 'PENDING', },
@@ -177,8 +177,8 @@ export class LoanService {
             res.message = 'EMI has been paid';
             loan.remaining_amount = loan.remaining_amount - amount;
             loan.remaining_emis = loan.remaining_emis - 1;
-            loan.emi_amount = loan.remaining_amount / loan.remaining_emis;
-            loan.transactional_logs.push(new Date().valueOf() + ":" + amount + " EMI has been paid by user and additional amount has been settled" );
+            loan.emi_amount = Math.ceil(loan.remaining_amount / loan.remaining_emis);
+            loan.transactional_logs.push(new Date().valueOf() + ": amount(" + amount + ") EMI has been paid by user and additional amount has been settled" );
             await this.loanRepository.update({ id: loanId }, loan);
             const emi = await this.emiRepository.find({
               where: { loan_id: loanId, status: 'PENDING', },

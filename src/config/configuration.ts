@@ -14,7 +14,7 @@ export default () => ({
       'redis://:' +
       process.env.REDIS_PASS +
       '@' +
-      (process.env.REDIS_HOST || 'localhost') +
+      (process.env.REDIS_HOST || 'redis') +
       ':' +
       (process.env.REDIS_PORT || 6379),
   },

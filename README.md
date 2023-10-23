@@ -8,7 +8,15 @@ http://127.0.0.1:3000/api
 ```
 git clone https://github.com/Khurana-Tarun/loan_app.git
 cd loan_app
-npm install
-docker-compose up -d
-npm start dev
+sudo chmod 755 start.sh stop.sh
 ```
+
+## Start
+```
+./start.sh
+```
+## Stop
+```
+./stop.sh
+```
+

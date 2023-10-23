@@ -1,17 +1,19 @@
 version: '3.8'
 services:
-  api:
-    container_name: api
+  app:
+    container_name: app
+    image: loan-app
     restart: always
     build: .
     ports:
       - ${PORT}:${PORT}
+    networks:
+      - appnet
     depends_on:
       - postgres
       - redis
     volumes:
     - .:/usr/src/app
-
   postgres:
     image: postgres:alpine
     restart: unless-stopped
@@ -29,7 +31,7 @@ services:
     image: redis:alpine
     volumes:
       - .docker/redis:/data
-    command: redis-server
+    command: redis-server --requirepass ${REDIS_PASS}
     networks:
       - appnet
     ports:

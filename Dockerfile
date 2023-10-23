@@ -1,4 +1,4 @@
-FROM node:16.3.0-alpine AS build
+FROM node:21.0.0-alpine3.18 AS build
 
 WORKDIR /app
 ADD package.json /app/package.json
@@ -12,7 +12,7 @@ ADD . /app
 RUN npm run build
 
 # Multistage docker
-FROM node:16.3.0-alpine
+FROM node:21.0.0-alpine3.18
 RUN apk --no-cache upgrade
 
 COPY --from=build /app /app

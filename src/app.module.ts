@@ -27,7 +27,7 @@ import { redisStore } from 'cache-manager-redis-store';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         store: (await redisStore({
-          url: configService.get('redis.url'),
+          url: configService.get('cache.url'),
         })) as unknown as CacheStore,
       }),
       inject: [ConfigService],
