@@ -57,7 +57,7 @@ export class AdminController {
       }
       return res;
     } catch (err) {
-      this.logger.error('Error while creatign a user', {
+      this.logger.error('Error while updating status', {
         error: err,
         data: loanDto,
       });

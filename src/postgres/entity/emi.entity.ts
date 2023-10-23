@@ -7,6 +7,9 @@ export class Emi extends TimedData {
   id: string;
 
   @Column({ type: 'integer' })
+  sequence: number;
+
+  @Column({ type: 'varchar' })
   loan_id: string;
 
   @Column({ type: 'integer' })

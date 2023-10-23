@@ -6,6 +6,7 @@ import {
   Inject,
   LoggerService,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -19,6 +20,7 @@ import { AuthGuard } from 'src/user/auth-guard';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { PaginationDto } from './dto/loan.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { RepaymentDto } from './dto/repayment.dto';
 
 @Controller('loan')
 export class LoanController {
@@ -26,7 +28,7 @@ export class LoanController {
     private loanService: LoanService,
     @Inject(WINSTON_MODULE_NEST_PROVIDER)
     private readonly logger: LoggerService,
-  ) {}
+  ) { }
 
   @UseGuards(AuthGuard)
   @ApiTags('loan')
@@ -70,19 +72,19 @@ export class LoanController {
       let res = null;
       if (data == 0) {
         res = new CommonApiResponse(HttpStatus.OK, 'Successful cancelled', {
-          laon_id: id,
+          loan_id: id,
         });
       } else if (data == 1) {
         res = new CommonApiResponse(
           HttpStatus.BAD_REQUEST,
-          'Loan is already in progress',
-          { laon_id: id },
+          'Loan is already in progress or cancelled',
+          { loan_id: id },
         );
       } else if (data == 2) {
         res = new CommonApiResponse(
           HttpStatus.BAD_REQUEST,
           'Loan with specific id does not exist',
-          { laon_id: id },
+          { loan_id: id },
         );
       }
       return res;
@@ -149,6 +151,33 @@ export class LoanController {
       return new CommonApiResponse(HttpStatus.OK, 'Loan', loanData);
     } catch (err) {
       this.logger.error('Error while fetching loan', {
+        error: err,
+        data: null,
+      });
+      return new CommonApiResponse(
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        'Error while processing the request',
+        null,
+      );
+    }
+  }
+
+  @UseGuards(AuthGuard)
+  @ApiTags('loan')
+  @Patch('repayment')
+  async repayment(
+    @Body() repayment: RepaymentDto,
+    @Request() req: any,
+  ): Promise<CommonApiResponse> {
+    try {
+      const data = await this.loanService.loanRepayment(req.user.username, repayment.loan_id, repayment.amount);
+      if (data.error) {
+        return new CommonApiResponse(HttpStatus.BAD_REQUEST, data.message, data.data);
+      } else {
+        return new CommonApiResponse(HttpStatus.OK, data.message, data.data);
+      }
+    } catch (err) {
+      this.logger.error('Error while fetching loans', {
         error: err,
         data: null,
       });

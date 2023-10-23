@@ -12,7 +12,7 @@ export class AdminService {
     private readonly loanRepository: Repository<Loan>,
     @InjectRepository(Emi)
     private readonly emiRepository: Repository<Emi>,
-  ) {}
+  ) { }
 
   async approveLoan(approveLoan: ApproveLoanDto): Promise<number> {
     const loan = await this.findLoan(approveLoan.loan_id);
@@ -21,18 +21,23 @@ export class AdminService {
         loan.status = approveLoan.status;
         loan.admin_comments = approveLoan.comment;
         loan.approval_date = new Date().toDateString();
-        await this.loanRepository.update({ id: approveLoan.loan_id }, loan);
-        const emis = [];
-        for (let i = 1; i <= loan.total_emis; i++) {
-          const emi = new Emi();
-          emi.loan_id = loan.id;
-          emi.amount = loan.amount / loan.total_emis;
-          const date = new Date();
-          date.setDate(new Date().getDate() + i * 7);
-          emi.status = 'PENDING';
-          emis.push(emi);
+        if (loan.status != LoanStatus.REJECTED) {
+          const emis = [];
+          for (let i = 1; i <= loan.total_emis; i++) {
+            const emi = new Emi();
+            emi.loan_id = loan.id;
+            emi.amount = loan.amount / loan.total_emis;
+            const date = new Date();
+            date.setDate(new Date().getDate() + i * 7);
+            emi.payment_date = date.toDateString();
+            emi.status = 'PENDING';
+            emi.sequence = i;
+            emis.push(emi);
+          }
+          await this.emiRepository.save(emis);
         }
-        await this.emiRepository.save(emis);
+        loan.transactional_logs.push(new Date().valueOf() + ":" + loan.status + " Loan status has been updated" );
+        await this.loanRepository.update({ id: approveLoan.loan_id }, loan);
         return 0;
       } else {
         return 1;
@@ -49,17 +54,36 @@ export class AdminService {
     return loan;
   }
 
-  async loanDetails(loan_id: string): Promise<any> {
+  async loanDetails(loanId: string): Promise<any> {
     const loan = await this.loanRepository.findOne({
-      where: { id: loan_id },
+      where: { id: loanId },
     });
     if (loan) {
-      const emis = await this.emiRepository.find({
-        where: { loan_id: loan_id },
-      });
-      const res = Object.create(loan);
-      res.emis = emis;
-      return res;
+      if (['PENDING', 'CANCELLED', 'REJECTED'].includes(loan.status)) {
+        return loan;
+      } else {
+        const emis = await this.emiRepository.find({
+          where: { loan_id: loanId },
+        });
+        const res = {
+          emis: emis,
+          created_at: loan.created_at,
+          updated_at: loan.updated_at,
+          id: loan.id,
+          amount: loan.amount,
+          remaining_amount: loan.remaining_amount,
+          user_id: loan.user_id,
+          periodicity: loan.periodicity,
+          total_emis: loan.total_emis,
+          remaining_emis: loan.remaining_emis,
+          description: loan.description,
+          admin_comments: loan.admin_comments,
+          approval_date: loan.approval_date,
+          status: loan.status,
+          transactional_logs :loan.transactional_logs
+        }
+        return res;
+      }
     } else {
       return null;
     }

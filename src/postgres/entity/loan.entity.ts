@@ -4,6 +4,7 @@ import { TimedData } from './common';
 export enum LoanStatus {
   PENDING = 'PENDING',
   CANCELLED = 'CANCELLED',
+  REJECTED = 'REJECTED',
   APPROVED = 'APPROVED',
   PAID = 'PAID',
 }
@@ -21,6 +22,9 @@ export class Loan extends TimedData {
 
   @Column({ type: 'integer' })
   amount: number;
+
+  @Column({ type: 'integer' })
+  remaining_amount: number;
 
   @Column({ type: 'integer' })
   emi_amount: number;
@@ -52,4 +56,7 @@ export class Loan extends TimedData {
     enum: ['PENDING', 'CANCELLED', 'APPROVED', 'PAID', 'REJECTED'],
   })
   status: string;
+
+  @Column({ type: 'varchar', array: true, default: [] })
+  transactional_logs: string[];
 }
