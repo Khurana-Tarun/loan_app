@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AdminService } from './admin/admin.service';
 import { LoanModule } from './loan/loan.module';
 import { AdminModule } from './admin/admin.module';
 import { UserModule } from './user/user.module';
@@ -73,6 +72,6 @@ import { redisStore } from 'cache-manager-redis-store';
     PostgresModule,
   ],
   controllers: [AppController],
-  providers: [AppService, AdminService],
+  providers: [AppService],
 })
 export class AppModule {}

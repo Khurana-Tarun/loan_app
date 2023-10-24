@@ -13,7 +13,7 @@ import { CommonApiResponse } from 'src/shared/response/utilities';
 import { UserService } from './user.service';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { AuthGuard } from './auth-guard';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @Controller('user')
 export class UserController {
@@ -25,6 +25,7 @@ export class UserController {
 
   @Post('')
   @ApiTags('User')
+  @ApiBearerAuth()
   async createUser(@Body() user: UserDto): Promise<CommonApiResponse> {
     try {
       const data = await this.userService.signup(user);
@@ -86,6 +87,7 @@ export class UserController {
   @UseGuards(AuthGuard)
   @Post('logout')
   @ApiTags('User')
+  @ApiBearerAuth()
   async logout(@Request() req: any): Promise<CommonApiResponse> {
     try {
       await this.userService.logout(req.user.username);

@@ -17,7 +17,7 @@ import { ApproveLoanDto } from './dto/approve.loan.dto';
 import { CommonApiResponse, parseNumber } from 'src/shared/response/utilities';
 import { AuthGuard } from '@nestjs/passport';
 import { PaginationDto } from 'src/loan/dto/loan.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiSecurity, ApiTags } from '@nestjs/swagger';
 
 @Controller('admin')
 export class AdminController {
@@ -29,6 +29,7 @@ export class AdminController {
 
   @UseGuards(AuthGuard('api-key'))
   @ApiTags('Admin')
+  @ApiSecurity('api-key')
   @Put('approve')
   async approveLoan(
     @Body() loanDto: ApproveLoanDto,
@@ -71,6 +72,7 @@ export class AdminController {
 
   @UseGuards(AuthGuard('api-key'))
   @ApiTags('Admin')
+  @ApiSecurity('api-key')
   @Get('find')
   async getAll(@Query() queryParam: PaginationDto): Promise<CommonApiResponse> {
     try {
@@ -102,6 +104,7 @@ export class AdminController {
 
   @UseGuards(AuthGuard('api-key'))
   @ApiTags('Admin')
+  @ApiSecurity('api-key')
   @Get('find/:loan_id')
   async get(@Param('loan_id') id: string): Promise<CommonApiResponse> {
     try {

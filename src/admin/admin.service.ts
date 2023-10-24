@@ -12,7 +12,7 @@ export class AdminService {
     private readonly loanRepository: Repository<Loan>,
     @InjectRepository(Emi)
     private readonly emiRepository: Repository<Emi>,
-  ) { }
+  ) {}
 
   async approveLoan(approveLoan: ApproveLoanDto): Promise<number> {
     const loan = await this.findLoan(approveLoan.loan_id);
@@ -36,7 +36,12 @@ export class AdminService {
           }
           await this.emiRepository.save(emis);
         }
-        loan.transactional_logs.push(new Date().valueOf() + ":" + loan.status + " Loan status has been updated" );
+        loan.transactional_logs.push(
+          new Date().valueOf() +
+            ':' +
+            loan.status +
+            ' Loan status has been updated',
+        );
         await this.loanRepository.update({ id: approveLoan.loan_id }, loan);
         return 0;
       } else {
@@ -80,8 +85,8 @@ export class AdminService {
           admin_comments: loan.admin_comments,
           approval_date: loan.approval_date,
           status: loan.status,
-          transactional_logs :loan.transactional_logs
-        }
+          transactional_logs: loan.transactional_logs,
+        };
         return res;
       }
     } else {

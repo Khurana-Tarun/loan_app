@@ -7,9 +7,6 @@ export default () => ({
     database: process.env.POSTGRES_DATABASE,
   },
   cache: {
-    // host: process.env.REDIS_HOST || 'localhost',
-    // port: process.env.REDIS_PORT || 6379,
-    // password: process.env.REDIS_PASS,
     url:
       'redis://:' +
       process.env.REDIS_PASS +
